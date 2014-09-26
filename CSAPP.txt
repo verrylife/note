@@ -1,0 +1,186 @@
+Chapter 7 Linking
+
+7.1 compiler drivers
+GCC is a compiler driver that invokes the language preprocessor, compiler, assembler, and linker for users.
+
+ASCII main.c ==> main.i ==> main.s ==> main.o ==> main
+            [cpp]      [cc]	  [as]	     [ld]   
+
+gcc -m32 ; To generate 32-bit code
+
+7.2 static linking
+linker's two main tasks: symbols resolution, relocation
+
+7.3 object files
+In three forms: relocatable object file, executable object file and shared object file
+
+compliers and assemblers generate relocatable object files and shared object files; linkers generate executable object files.
+
+7.4 relocatable object files
+ELF header begins with a 16-byte sequence
+
+arrangement in file,
+| ELF header | sections | section header table |
+
+to display section header table,
+readelf --sections main.o
+
+.bss uninitialized global C variables
+
+7.5 symbols and symbol tables
+each relocatable module has a symbol table, 
+in 3 types: 
+global symbols defined by this module and referenced by other module without static attribute
+global symbols referenced by this module but defined by other module without static attribute
+local symbols defined and referenced by this module with static attribute
+
+compiler allocates space in .data or .bss for local static program variables and creates a link symbol on the symbol table
+
+local nonstatic program variables are managed on the stack at run time
+
+C use _static_ to hide variable and function declarations inside modules, like _private_ in java
+
+symbols tables are built by assemblers, are contained in .symtab section.
+typedef struct{
+int name;	/* index of string table */
+int value;	/* section offset for relocated object files,
+		   absolute run-time address for executable object file */
+int size;	/* object size in bytes */
+char type:4,	/* data or function */
+     binding:4;	/* local or global */
+char reserved;	/* unused */
+char section;	/* section header index, ABS, UNDEF, COMMON */
+
+}Elf_Symbol;
+
+to display symbol table,
+readelf --symbols main.o
+
+7.5 symbol resolution
+when compiler encounters a symbol(either a variable or function name) that is not defined in the current module, it assumes that it is defined in some other module, generates a linker symbol table entry, and leave it for linker to handle.
+
+*overload* implementation by _mangling_, java compiler encodes unique method and parameter list combination into a unique name for the linker.
+
+7.6.1 how linkers resolve mutiply defined global symbols
+functions and initialized global symbols get strong symbols
+uninitialized global symbols get weaks symbols
+
+rules for linker dealing with multiply defined symbols
+1.multiply strong symbols are not allowed
+2.given a strong symbol and multiply weak symbols, choose the strong symbol
+3.given multiply weak symbols, choose anyone
+
+7.6.2 linking with static libraries
+to create a static library,
+ar rcs libfruit.a apple.o banana.o
+
+to link with a static library, static is the default,
+gcc -static -o pram main.o ./libfruit.a
+
+7.6.3 how linkers use static libraries to resolve references
+gcc foo.c x.o liby.a libz.a
+
+linker scan comand line input files left to right and maintain three sets, E, U, D
+E: relocatable object files that will be merge into the executable
+U: unresolved symbols
+D: defined symbols
+
+if U is nonempty when linkers finish scanning input files, it prints error.
+
+7.7 relocation
+linker merges all sections of the same type(.text) into a bigger one from the input modules to executable object file.
+
+7.7.1 relocation entries
+assembler generates a relocation entry for linker to use
+
+relocation entry for initialized data in .rel.data
+relocation entry for code in .rel.text
+
+ELF relocation entry,
+typedef struct{
+	int offset; 	/* .text or .data section offset */
+	int symbol:24,	/* index of .symtab */
+	    type:8;	/* relocation type */
+}Elf32_Rel;
+
+ELF defines 11 relocation types, 2 basic types
+R_386_PC32, use a 32-bit PC-relative address to relocate a reference
+R_386_32, use a 32-bit absolute address to relocate a reference
+
+7.7.2 relocating symbol references
+when apply PC-relative addressing,
+ADDRESS(section) + offset = PC + VALUE( ADDRESS(section) + offest )
+therefore,
+PC = ADDRESS(section) + offset - VALUE( ADDRESS(section) + offest )
+real_offset = ADDRESS(symbol) - PC
+
+when _call_ instruction,
+1.push PC onto stack
+2.PC <- PC + real_offset
+
+when apply absolute addressing,
+real_offset = ADDRESS(symbol) + offset
+
+7.8 executable object files
+.init section defines _init function for initialization
+
+code segment(read-only)
+| ELF header |
+| segment header table |
+| .init |
+| .plt|
+| .text |
+| .rodata |
+
+data segment(read/write)
+| .got |
+| .got.plt |	;_GLOBAL_OFFSET_TABLE value
+| .data |
+| .bss |	;will be initialized to zero at run time
+
+symbol table and others(not in memory)
+| .symtab |
+| .debug |
+| .line |
+| .strtab |
+| section header table |
+
+7.9 load executable object files
+on 32-bit linux systems, the code segment starts at address 0x08048000
+code segment: 4KB
+data segment: next 4KB
+run-time heap: next 4KB
+reserved segment for shared libraries
+
+Unix invokes _loader_, memory-resident OS code, to copy the code and data segment in the executable object file from disk into memory, then jump to the entry point for running.
+1.load code and data segment to memory guided by the segment header table
+2.program's entry point, _start address, is defined in the file _crt1.o_ 
+
+7.10 dynamic linking with shared libraries
+shared objects, at run time, can be loaded at an arbitrary memory address
+
+gcc -shared -fPIC -o libfruit.so apple.o banana.o
+gcc -o pram2 main.c ./libfruit.so
+
+none of code and data segment from shared libraries are actually copied into the executable,
+instead, the linker copies some relocation and symbol table info for reference into the excutable.
+
+7.11 loading and linking shared libraries from applications
+application can load arbitrary shared libraries at run time
+
+gcc -rdynamic -o pram main.c ./libfruit.so
+flag -rdynamic will intruct the linker to add all symbols, not only used symbols, in shared libraries to dynamic symbol table
+
+7.12 position-independent code
+load-time relocation requires load shared object first, then fix up the addresses in the text segment, so the text segment can be rewritable and not shared among process.
+
+PIC use GOT indirection technique to make text segment read-only, move GOT to data segment which can be rewriteable.
+
+compiler creates global offset table(GOT) at the beginning of the data segment in shared object file
+GOT contains an entry for global functions and variables referenced by this object module
+
+PIC code uses an additional register to hold the address the GOT entry
+procedure linkage table(PLT) is part of the .text section with 16 bytes each record
+
+lazy binding: first time to call the function, program jump to the address of PLT[n], it will calculate actual function address, then overwrite associated GOT[n], and pass control to the function.
+

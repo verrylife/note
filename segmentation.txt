@@ -1,0 +1,17 @@
+segmentation was introduced on the intel 8086 as a way to allow programs to address more than 64KB of memory, and this version is real mode.
+
+The intel 80286 introducted a second version of segmentation, that added support for _virtual memory_ and _memory protection_, and this was named protected mode.
+
+In both read and protected modes, the system use 16-bit segment registers to obtain the actual memory address.
+
+Read mode,
+CS: code segment
+DS: data segment
+SS: stack segemnt
+ES: programmer use
+
+The intel 80386 introduced _paging_ unit, and added two more segment registers, FS and GS
+
+x86-64 architecture force CS, SS, DS, ES to zero, and FS, GS can be used.
+
+

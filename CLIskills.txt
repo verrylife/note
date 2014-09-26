@@ -1,0 +1,23 @@
+只显示隐藏文件夹
+ls -d .*/
+
+删除指定目录下非隐藏非文件夹的全部文件
+ find /home/verry/ -maxdepth 1 -type f -not -name ".*" -exec rm -v {} \; 
+
+无线网络故障检查
+lspci -nn#ls all PCI devices With names and numbers
+lsmod#ls status of modules in kernel
+rfkill list all#tool for enabling or disabling wireless devices
+sudo lshw -c network#list hardware
+rmmod -f rtl8192se
+modprobe rtl8192se
+
+
+objdump -tT /lib/i386-gnu-linux/libc.so.6
+objdump -x hello | grep NEEDED
+objdump -s hello
+readelf --symbols hello
+readelf --sections hello
+readelf --segments hello
+
+

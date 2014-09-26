@@ -1,0 +1,39 @@
+2.2.1 Thread usage
+why need threads?
+1. progamming model becomes simpler by decomosing an app into multiple sequential threads that run in quasi-parallel, and parallel entities to share an address space and all of data
+2. lighter weight than processes, easier to create and destroy
+3. speed up the app when allow substantial computing and also substantial I/O activities to overlap
+
+Blocking system calls make programming easier, and parallelism improve performance.
+
+2.2.2 The classical thread model
+The process model is based on two independent concepts: resource grouping and execution.
+Processes are used to group resources together, and threads are the entities scheduled for execution on the CPU.
+There is no protection between threads within the process' address space, and it's impossible and unnecessary.
+
+Per process items:
+address space
+global varibles
+open files
+child processes
+pending alarms
+signals and signal handlers
+accounting information
+
+Per thread items:
+program counter
+registers
+stack
+state
+
+Like a traditional process, a thread can be in any one of several states: running, blocked, ready, terminated.
+
+2.2.3 POSIX Threads
+IEEE standard 1003.1c, called Pthreads, defines over 60 function call
+
+2.2.4 Implementing threads in user space
+Two main ways to implement: in user space and in kernel space
+
+Hybrid mode, each kernel-level thread has some set of user-level threads that take turns using it.
+
+

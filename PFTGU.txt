@@ -1,0 +1,80 @@
+chapter 2 computer architecture
+Von Neumann architecture,
+two main parts, CPU and memory
+
+computer use registers to hold things for current computation
+computer use memory to store data and instructions
+
+fetch-execute cycle
+
+CPU contains, program counter, instruction decoder, general-purpose registers, arithmetic and logic unit
+
+data accessing methods
+immediate addressing, direct addressing, indexed addressing, indirect addressing, base pointer addressing, which is similar to indirect addressing
+
+chapter 3 your first pragrams
+%eax holds the system call number
+%ebx holds the return status
+
+_start is a symbol, that is the only one forced
+symbols are used to mark or look up numeric memory address of every piece of code or data.
+
+.globl linker will use this to look up the entry of program, and it's unnecessary to declare other symbols or labels as .globl
+
+general-purpse registers,
+%eax, %ebx, %ecx, %edx, %esi, %edi
+
+speicial-purpse registers,
+%eip, %ebp, %esp, %eflags
+
+%eip and %eflags can only be accessed by special instructions
+
+.byte 1-byte
+.int 2-byte
+.long 4-byte
+.ascii "hello world"
+
+memory address reference like this,
+address_or_offset(base_or_offset, index, mutiplier)
+
+addressing mode,
+immediate addressing mode: movl $3, %eax
+direct addressing mode: movl address, %eax
+indexed addressing mode: movl array(,%edi,4), %eax
+indirect addressing mode: movl (%edi), %eax
+base pointer addressing mode: movl 4(%edi), %eax
+
+every mode can be used as either source or destination operand, except
+immediate mode can only be a source operand
+
+chapter 4 all about functions
+function is a symbol that represent the memory address where function code starts
+use functions to break program apart into seperate pieces
+
+call instructions does two things,
+push return value address(%eip) onto the stack, and move instruction pointer (%eip) to the start of function address
+
+before call a function,
+pushl para_N
+...
+pushl para_2
+pushl para_1
+
+call a function,
+push %eip
+movl ADDRESS(function), %eip
+
+step into a function,
+pushl %ebp
+movl %esp, %ebp
+
+before a function return,
+movl %ebp, %esp
+popl %ebp
+
+function return,
+ret
+
+
+
+

@@ -37,6 +37,8 @@ speicial-purpse registers,
 memory address reference like this,
 address_or_offset(base_or_offset, index, mutiplier)
 
+address_or_offset and mutiplier both are constants, base_or_offset and index both are registers
+
 addressing mode,
 immediate addressing mode: movl $3, %eax
 direct addressing mode: movl address, %eax
@@ -52,21 +54,22 @@ function is a symbol that represent the memory address where function code start
 use functions to break program apart into seperate pieces
 
 call instructions does two things,
-push return value address(%eip) onto the stack, and move instruction pointer (%eip) to the start of function address
+push return address(%eip) onto the stack, and move instruction pointer (%eip) to the start of function address
 
-before call a function,
+before a function call,
 pushl para_N
 ...
 pushl para_2
 pushl para_1
 
-call a function,
+call a function, #new frame start from here
 push %eip
 movl ADDRESS(function), %eip
 
 step into a function,
 pushl %ebp
 movl %esp, %ebp
+subl $4, %esp	#store local variable
 
 before a function return,
 movl %ebp, %esp
@@ -75,6 +78,55 @@ popl %ebp
 function return,
 ret
 
+return to calling code,
+addl $(4 * N), %esp
 
+save all necessary registers before call a function according to system V ABI
+
+.globl symbol means not-static type definition
+
+chapter 5 dealing with file
+
+unix file, the simplest and most universal way,
+1.open a file
+%eax holds open system call 5
+%ebx holds the address of file
+%ecx holds read/write intentions
+%edx holds permission set
+2.return %eax 
+%eax holds file descriptor
+3.operate on a file
+%ebx holds file descriptor
+%ecx holds the address to read 3 or write 4
+%edx holds size of buffer
+%eax holds error code or number of bytes read from or write out
+4.close a file
+%eax holds system call close 6
+%ebx holds file descriptor
+
+a buffer is a continuous block of bytes used for bulk data transfer
+
+to create a buffer, you need to reserve either static or dynamic storage
+
+static storage will be allocated in the .data section
+
+drawbacks of static storage
+1. tedious to type when bulk data
+2. take up space in the executable
+
+.section .bss
+.lcomm my_buffer, 500
+
+at least 3 open file descriptor in linux,
+stdin read-only
+stdout write-only
+stderr write-only
+
+.equ directive to declare constant varables
+
+a pragram with several arguments, after move %esp to %ebp,
+8(%ebp)	-> ADDRESS(argv[1])
+4(%ebp)	-> ADDRESS(argv[0])
+%ebp 	-> argc
 
 

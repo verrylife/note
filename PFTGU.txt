@@ -42,7 +42,7 @@ address_or_offset and mutiplier both are constants, base_or_offset and index bot
 addressing mode,
 immediate addressing mode: movl $3, %eax
 direct addressing mode: movl address, %eax
-indexed addressing mode: movl array(,%edi,4), %eax
+indexed addressing mode: movl address(,%edi,4), %eax
 indirect addressing mode: movl (%edi), %eax
 base pointer addressing mode: movl 4(%edi), %eax
 
@@ -85,6 +85,9 @@ save all necessary registers before call a function according to system V ABI
 
 .globl symbol means not-static type definition
 
+.type directive to difine a function, like
+.type a_function, @function
+
 chapter 5 dealing with file
 
 unix file, the simplest and most universal way,
@@ -117,16 +120,39 @@ drawbacks of static storage
 .section .bss
 .lcomm my_buffer, 500
 
+$ dollar sign before symbol use immediate addressing mode, like & in c,
+$my_buffer --- &value
+
 at least 3 open file descriptor in linux,
 stdin read-only
 stdout write-only
 stderr write-only
 
-.equ directive to declare constant varables
+.equ directive to declare constant varables, like
+.equ STDIN, 0
 
 a pragram with several arguments, after move %esp to %ebp,
 8(%ebp)	-> ADDRESS(argv[1])
 4(%ebp)	-> ADDRESS(argv[0])
 %ebp 	-> argc
+
+chapter 6 reading and writing sample record
+
+.include directive to include constants file, like
+.include "defs.s"
+
+chapter 7 devloping robust program
+
+chapter 8 sharing functions with code libraries
+
+ld -dynamic-linker /lib/ld-linux.so -lc myprog.o -o myprog 
+
+chapter 9 intermediate memory topics
+
+stack start at the address 0xbf ff ff ff
+
+the process of asigning virtual addresses to physicial addresses is call mapping
+
+
 
 

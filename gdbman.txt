@@ -1,0 +1,31 @@
+gdb <prog> <core>
+gdb <prog> <pid> 
+gdb --args <p1> <p2>
+dump binary memory <file> <start_addr> <end_addr>
+(b)reakpoint <function|line|+offset|-offset|*address>
+(f)ile  ;load file for debug
+(l)ist line1, line2 ;list source code
+(r)un   ;run binary file
+(c)ontinue  ;continue to next breakpoint
+(p)rint/t|d|x $eax ;print the value of variable
+print i=33  ;set value
+set var i=33
+set $pc=0xffff  ;modify %eip
+(n)ext  ;next line
+(s)tep  ;step into a function
+until   ;run to the end of this block
+finish  ;run to the end of program
+(b)ack(t)trace  ;print the stack info
+e(x)amine/size/t|d|x/b|h|w|g ;display value in memory
+x/s <addr> ;display string
+attach  ;attach pid
+
+set args <expr1> <expr2>  ;set arguments from para1 not para0
+show args
+info breakpoint ;display breakpoint
+delete breakpint  ;delete breakpoint
+watch <expr>  ;break when <expr> changed
+rwatch <expr> ;break when <expr> is read
+awatch <expr> ;break when <expr> is read or writen
+catchpoint exec|fork|load <libxx.so>|unload <libxx.so>
+

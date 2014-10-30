@@ -1,0 +1,32 @@
+git help
+
+git clone ;repository
+
+mkdir newfolder
+git init
+git add .
+
+git add *.txt
+git commit -m "messages"
+
+git status
+git diff xxx.txt
+
+git log
+git reset --hard {HEAD^ or commit no}
+git reflog
+git check --<file.name>
+git rm
+
+git branch
+git branch <name> ;creat a branch
+git checkout <name>
+git merge <name>
+git branch -d <name> ;delete branch
+
+git remote add origin git@github.com:verrylife/note.git
+git push origin master
+
+git pull origin master ;update from remote
+
+git remote show origin

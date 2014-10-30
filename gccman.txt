@@ -1,0 +1,2 @@
+;display linking files
+gcc -static -o foo foo.o -Wl,--verbose

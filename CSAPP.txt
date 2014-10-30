@@ -1,3 +1,10 @@
+Chapter 4 Processor Architecture
+A sequence of instructions supported by byte-level encodings known as ISA
+4.1.1 programmer-visible state
+
+
+
+
 Chapter 7 Linking
 
 7.1 compiler drivers
@@ -71,7 +78,7 @@ rules for linker dealing with multiply defined symbols
 3.given multiply weak symbols, choose anyone
 
 7.6.2 linking with static libraries
-to create a static library,
+Go create a static library,
 ar rcs libfruit.a apple.o banana.o
 
 to link with a static library, static is the default,
@@ -184,3 +191,49 @@ procedure linkage table(PLT) is part of the .text section with 16 bytes each rec
 
 lazy binding: first time to call the function, program jump to the address of PLT[n], it will calculate actual function address, then overwrite associated GOT[n], and pass control to the function.
 
+Chapter 8 Exceptions
+
+8.1.2 classes of exceptions
+4 classes,
+interrupts, traps, faults, aborts
+
+interrupts occur asynchronously because signals from I/O devices that are
+external to the processor
+
+traps are intentional exceptions that occur as a result of executing an
+instruction
+
+8.1.3 exceptions in linux/IA32 system
+256 exception types,
+0-31 defined by intel architecture
+32-255 interrupts and traps defined by OS
+
+0   divide error
+13  general protection fault 
+program refenence an undefined area of virtual memory
+program write to a read-only text segment
+linux reports "segmentation faults"
+
+14  page fault
+18  machine check
+
+256 entries in IA32 system exception table
+%eax holds syscall number
+%ebx %ecx %edx %esi %edi %ebp hold 6 arbitrary arguments
+
+8.2 process
+process, an instance of a program in execution
+
+parallel flows are a subset of concurrent flows, that are running on different prcessor cores or computers
+
+/proc,kernel data structures
+/sys,low-level system bus and devices
+
+chapter 9 Memory
+VM is an abstraction of main memory
+VM provides three capabilities,
+use main memory efficiently, by treating it as a cache for an address space
+store on disk
+simplify memory management, by providing each process with a uniform address
+space
+protect the address space of each process, from corruption from other processes
